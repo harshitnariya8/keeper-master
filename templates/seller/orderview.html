@@ -1,0 +1,158 @@
+{% extends "seller/base.html" %}
+{% block content %}
+
+<div id="retailerorders" class="app-content">
+          <div class="app-content-header">
+            <h1 class="app-content-headerText">
+                <button onclick="sidebaropen()" class="wrapper-menu">
+                  <div class="line-menu half start"></div>
+                  <div class="line-menu"></div>
+                  <div class="line-menu half end"></div>
+                </button>
+                Orders</h1>
+          </div>
+          <div class="app-content-actions">
+            <input id="ordersearch" class="search-bar" onkeyup="filterFunction()" placeholder="Search..." type="text">
+            <div class="app-content-actions-wrapper">
+                <form method="get" action="{% url 'acceptOrder' %}">
+                  <input type="hidden" name="order_status" value="ALL">
+                  <button class="order-toggle-button {% if request.get_full_path == "/seller/acceptOrder?order_status=ALL" or request.get_full_path == "/seller/acceptOrder"  %}active{% endif %}">All</button>
+                </form>
+                <form method="get" action="{% url 'acceptOrder' %}">
+                  <input type="hidden" name="order_status" value="PENDING">
+                  <button class="order-toggle-button {% if request.get_full_path == "/seller/acceptOrder?order_status=PENDING" %}active{% endif %}">Pending</button>
+                </form>
+                <form method="get" action="{% url 'acceptOrder' %}">
+                  <input type="hidden" name="order_status" value="ACCEPTED">
+                  <button class="order-toggle-button {% if request.get_full_path == "/seller/acceptOrder?order_status=ACCEPTED" %}active{% endif %}">Accepted</button>
+                </form>
+                <form method="get" action="{% url 'acceptOrder' %}">
+                  <input type="hidden" name="order_status" value="REJECTED">
+                  <button class="order-toggle-button {% if request.get_full_path == "/seller/acceptOrder?order_status=REJECTED" %}active{% endif %}">Rejected</button>
+                </form>
+                <form method="get" action="{% url 'acceptOrder' %}">
+                    <input type="hidden" name="order_status" value="SHIPPED">
+                    <button class="order-toggle-button {% if request.get_full_path == "/seller/acceptOrder?order_status=SHIPPED" %}active{% endif %}">Shipped</button>
+                </form>
+                <form method="get" action="{% url 'acceptOrder' %}">
+                    <input type="hidden" name="order_status" value="DELIVERED">
+                    <button class="order-toggle-button {% if request.get_full_path == "/seller/acceptOrder?order_status=DELIVERED" %}active{% endif %}">Delivered</button>
+                </form>
+            </div>
+          </div>
+          <div class="orders-area-wrapper tableView">
+            <div id="ordershowtitle" class="products-header order-arrange list-container-main">
+              <div class="orders-cell">Order ID</div>
+              <div class="orders-cell">Time</div>
+              <div class="orders-cell">Customer Name</div>
+              <div class="orders-cell">Delivery Type</div>
+              <div class="orders-cell">Status</div>
+              <div class="orders-cell">Amount</div>
+            </div>
+
+
+            <div id="ordershow" class="list-container-main">
+                {% for order in orders %}
+
+              <div class="products-row order-arrange">
+                    <a href="{% url 'orderdetails' id=order.id %}">
+                  <p class="orders-cell order-id">#{{ order.id }}</p>
+                    </a>
+                  <div class="orders-cell time"><span class="cell-label">Time:</span>{{ order.created_date }}</div>
+                  <div class="orders-cell cusname"><span class="cell-label">{{ order.customer_name }}</span>{{ order.customer_name }}</div>
+                  <div class="orders-cell payment-cell">
+                    <span class="cell-label">Order Type:</span>
+                    <span style="color: {% if order.order_type == 'HOME_DELIVERY' %}rgba(60, 65, 94, 1){% else %}rgba(216, 52, 95, 1){% endif %}">{{ order.order_type }}</span>
+                  </div>
+
+                  <div class="orders-cell status-cell">
+                    <span class="cell-label">Status:</span>
+                    <span class="status {% if order.order_status == 'ACCEPTED' %}active{% elif order.order_status == 'REJECTED' %}rejected{% elif order.order_status == 'PENDING' %}pending{% elif order.order_status == 'SHIPPED' %}shipped{% elif order.order_status == 'DELIVERED' %}delivered{% else %}disabled{% endif %}">
+                        {{ order.order_status }}
+                    </span>
+                     <form method="POST" action="{% url 'editstatus' %}" class="col-md-5 offset-1">
+                            {% csrf_token %}
+                        {% if order.order_status != 'REJECTED' and order.order_status != 'DELIVERED'  %}
+                            <select class="status" name="status" id="order_type" onChange="form.submit();" style="border: none">
+                                {% if order.order_type == "HOME_DELIVERY" %}
+                                    {% if order.order_status == 'PENDING' %}
+                                        <option value="PENDING" selected>PENDING</option>
+                                        <option value="ACCEPTED">ACCEPT</option>
+                                        <option value="REJECTED">REJECT</option>
+                                    {% elif order.order_status == 'ACCEPTED' %}
+                                        <option value="ACCEPTED" selected>ACCEPTED</option>
+                                        <option value="SHIPPED">SHIPPED</option>
+                                        <option value="DELIVERED">DELIVERED</option>
+                                    {% elif order.order_status == 'SHIPPED' %}
+                                        <option value="SHIPPED" selected>SHIPPED</option>
+                                        <option value="DELIVERED">DELIVERED</option>
+                                    {% else %}
+                                    {% endif %}
+                                {% elif order.order_type == "PICK_UP" %}
+                                    {% if order.order_status == 'PENDING' %}
+                                        <option value="ACCEPTED">ACCEPT</option>
+                                        <option value="REJECTED">REJECT</option>
+                                    {% elif order.order_status == 'ACCEPTED' %}
+                                        <option value="">Select</option>
+                                        <option value="DELIVERED">DELIVERED</option>
+                                    {% endif %}
+                                {% endif %}
+                            </select>
+                           <input type="hidden" name="or_id" value="{{ order.id }}">
+                        {% endif %}
+
+
+                     </form>
+                  </div>
+
+
+                  <div class="orders-cell amount"><span class="cell-label">Price:</span>{{ order.ttl_amount }}</div>
+                </div>
+
+                {% endfor %}
+            </div>
+          </div>
+        </div>
+
+    <script>
+        function filterFunction() {
+          var input, filter, p,a, i;
+          input = document.getElementById("ordersearch");
+          filter = input.value.toUpperCase();
+          div = document.getElementById("ordershow");
+          p = div.getElementsByTagName("p");
+          a = div.getElementsByTagName("a");
+
+          for (i = 0; i < p.length; i++) {
+            txtValue = p[i].textContent || p[i].innerText;
+            if (txtValue.toUpperCase().indexOf(filter) > -1) {
+              a[i].style.display = "";
+            } else {
+              a[i].style.display = "none";
+            }
+          }
+        }
+    </script>
+    <script>
+        var isSyncingLeftScroll = false;
+        var isSyncingRightScroll = false;
+        var leftDiv = document.getElementById('ordershowtitle');
+        var rightDiv = document.getElementById('ordershow');
+
+        leftDiv.onscroll = function() {
+          if (!isSyncingLeftScroll) {
+            isSyncingRightScroll = true;
+            rightDiv.scrollLeft = this.scrollLeft;
+          }
+          isSyncingLeftScroll = false;
+        }
+
+        rightDiv.onscroll = function() {
+          if (!isSyncingRightScroll) {
+            isSyncingLeftScroll = true;
+            leftDiv.scrollLeft = this.scrollLeft;
+          }
+          isSyncingRightScroll = false;
+        }
+    </script>
+{% endblock %}

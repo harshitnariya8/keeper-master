@@ -1,0 +1,11 @@
+{% extends "customer/base.html" %}
+{% block content %}
+
+{% for ord in order_data %}
+    {{ ord.customer_id }}
+    {{ ord.order_details }}
+    Accepted :{{ ord.is_accepted }}
+    Rejected :{{ ord.is_rejected }}
+    <br>
+{% endfor %}
+{% endblock %}

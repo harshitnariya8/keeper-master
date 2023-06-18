@@ -1,0 +1,30 @@
+{% extends "customer/base.html" %}
+{% block content %}
+     <form method="post" action="{% url 'confirm' %}">
+         {% csrf_token %}
+        <div class="cart-back">
+            <div class="cart-padding">
+                <div id="showcart" class="cart big">
+
+                </div>
+                <div id="billcart" class="cart-container small">
+
+                </div>
+            </div>
+        </div>
+     </form>
+
+<script>
+	function changeOrderType() {
+        OrderType = document.getElementById('order_type');
+        if (OrderType.value === "PICK_UP"){
+            document.getElementById("datetime").style.display = "flex";
+        }else if (OrderType.value === "HOME_DELIVERY"){
+            document.getElementById("datetime").style.display = "none";
+            document.getElementById("pick_up_date").value = null;
+        }
+    }
+</script>
+
+
+{% endblock %}

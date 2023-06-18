@@ -1,0 +1,114 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en" >
+<head>
+  <meta charset="UTF-8">
+  <link rel="stylesheet" href="{% static 'sellers/css/seller_login.css' %}">
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
+<script src="https://maps.googleapis.com/maps/api/js"></script>
+
+</head>
+<body>
+
+<div class="container" id="container">
+        <div class="form-container sign-up-container">
+            <form name="addAddress" method="post" action="{% url 'addAddress' %}" onsubmit="return validateForm()">
+                {% csrf_token %}
+                <h1 class="reg-title">Add address</h1>
+                <input name="address" placeholder="Flat no., area name">
+                <input name="city" placeholder="City">
+                <input name="pincode" placeholder="Pincode">
+
+                <button type="submit">Add address</button>
+                <input type="hidden" name="latiLong" id="latiLong" />
+            </form>
+        </div>
+        <div class="overlay-container">
+            <div class="overlay">
+                <div style="height: 100%" id="map_canvas"></div>
+                 <div id="coordinates"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+         function validateForm() {
+             var address = document.forms["addAddress"]["address"];
+             var city = document.forms["addAddress"]["city"];
+             var pincode = document.forms["addAddress"]["pincode"];
+             var latiLong = document.forms["addAddress"]["latiLong"];
+             if (address.value == null || address.value === "") {
+                 address.classList.add("input-validation");
+                 address.style.border = "1px solid red";
+                 address.placeholder = 'Please enter valid address!';
+                 setTimeout(function(){
+                    address.classList.remove("input-validation");
+                    address.style.border = "1px solid rgba(0,0,0,0.2)";
+                    address.placeholder = 'Flat no., area name';
+                 }, 2000);
+                 return false;
+             }
+             if (city.value == null || city.value === "") {
+                 city.classList.add("input-validation");
+                 city.style.border = "1px solid red";
+                 city.placeholder = 'Please enter valid city!';
+                 setTimeout(function(){
+                    city.classList.remove("input-validation");
+                    city.style.border = "1px solid rgba(0,0,0,0.2)";
+                    city.placeholder = 'City';
+                 }, 2000);
+                 return false;
+
+             }
+             if (pincode.value == null || pincode.value === "") {
+                 pincode.classList.add("input-validation");
+                 pincode.style.border = "1px solid red";
+                 pincode.placeholder = 'Please enter valid email pincode!';
+                 setTimeout(function(){
+                    pincode.classList.remove("input-validation");
+                    pincode.style.border = "1px solid rgba(0,0,0,0.2)";
+                    pincode.placeholder = 'Pincode';
+                 }, 2000);
+                 return false;
+             }
+         }
+    </script>
+    <script
+      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBwvCP9pQ19x79rk3DpreTV6AypI_tKtqw&callback=initMap&v=weekly"
+      async
+    ></script>
+<script>
+    function initialize() {
+                 var crosshairShape = {
+                     coords: [0, 0, 0, 0],
+                     type: 'rect'
+                 };
+                 var latlng = new google.maps.LatLng(22.62279178711505, 73.895538330078125);
+                 var myOptions = {
+                     zoom: 12,
+                     center: latlng,
+                     {#mapTypeId: google.maps.MapTypeId.SATELLITE,#}
+                     mapTypeControlOptions: {
+                         style: google.maps.MapTypeControlStyle.DROPDOWN_MENU
+                     }
+                 };
+                 var map = new google.maps.Map(document.getElementById("map_canvas"), myOptions);
+                 var marker = new google.maps.Marker({
+                     map: map,
+                 });
+                 document.getElementById('coordinates').innerHTML = "<b>center coordinates</b>: " + map.getCenter().toUrlValue(6)
+                 google.maps.event.addListener(map, 'center_changed', function () {
+                     document.getElementById('coordinates').innerHTML = "<b>center coordinates</b>: " + map.getCenter().toUrlValue(6);
+                     document.getElementById('latiLong').value = map.getCenter().toUrlValue(6);
+                 });
+                 marker.bindTo('position', map, 'center');
+             }
+
+             google.maps.event.addDomListener(window, 'load', initialize);
+
+</script>
+
+
+
+</body>
+</html>

@@ -1,0 +1,120 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en" >
+<head>
+  <meta charset="UTF-8">
+  <link rel="stylesheet" href="{% static 'sellers/css/seller_login.css' %}">
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
+
+
+</head>
+<body>
+    {% if messages %}
+        {% for message in messages %}
+        <div class="warning-pop-up">
+            <p id="warning" {% if message.tags %} class=" {{ message.tags }} " {% endif %}>{{ message }}</p>
+        </div>
+        {% endfor %}
+    {% endif %}
+<div class="container" id="container">
+        <div class="form-container sign-up-container">
+            <form name="sellogin" method="POST" action="{% url 'sellerLogin' %}" onsubmit="return validateForm()">
+                {% csrf_token %}
+                <h1 class="reg-title ">Welcome back!</h1>
+                <input name="username"  placeholder="User Name">
+                <input name="password" type="password"  placeholder="Password">
+                <div class="input-devide">
+                    <p></p>
+                    <a href="">Forgot password</a>
+                </div>
+                <button type="submit">Sign in</button>
+                <div>
+                    <p>Don't have an account? <a href="{% url 'sellerRegister' %}">Register</a></p>
+                </div>
+            </form>
+        </div>
+        <div class="overlay-container">
+            <div class="overlay sel-poster"></div>
+        </div>
+    </div>
+
+<script>
+         function validateForm(f) {
+             var a = document.forms["sellogin"]["username"];
+             var b = document.forms["sellogin"]["password"];
+             if (a.value == null || a.value === "") {
+                 a.classList.add("input-validation");
+                 a.style.border = "1px solid red";
+                 a.placeholder = 'Please enter valid username!';
+                 setTimeout(function(){
+                    a.classList.remove("input-validation");
+                    a.style.border = "1px solid rgba(0,0,0,0.2)";
+                    a.placeholder = 'Username';
+                 }, 3000);
+                 return false;
+
+             }
+             if (b.value == null || b.value === "") {
+                 b.classList.add("input-validation");
+                 b.style.border = "1px solid red";
+                 b.placeholder = 'Please enter valid password!';
+                 setTimeout(function(){
+                    b.classList.remove("input-validation");
+                    b.style.border = "1px solid rgba(0,0,0,0.2)";
+                    b.placeholder = 'Password';
+                 }, 3000);
+                 return false;
+             }
+
+         }
+    </script>
+    <script>
+        const war = document.querySelector('.warning-pop-up');
+               setInterval(function () {
+                   war.style.visibility = 'visible';
+                   war.style.opacity = '1';
+                   war.style.transform = 'translateY(1rem)';
+                   setTimeout(function () {
+                       war.remove();
+                   }, 3000)
+               }, 10);
+
+    </script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBwvCP9pQ19x79rk3DpreTV6AypI_tKtqw&callback=initMap&v=weekly" async></script>
+    <script>
+    function initMap() {
+  const myLatlng = { lat: 22.29, lng: 73.16 };
+  const map = new google.maps.Map(document.getElementById("map"), {
+    zoom: 12,
+    center: myLatlng,
+  });
+  // Create the initial InfoWindow.
+  let infoWindow = new google.maps.InfoWindow({
+    content: "Click the map to get Lat/Lng!",
+    position: myLatlng,
+  });
+
+  infoWindow.open(map);
+  // Configure the click listener.
+  map.addListener("click", (mapsMouseEvent) => {
+    // Close the current InfoWindow.
+    infoWindow.close();
+    // Create a new InfoWindow.
+    infoWindow = new google.maps.InfoWindow({
+      position: mapsMouseEvent.latLng,
+    });
+    infoWindow.setContent(
+      document.getElementById('longlat').innerHTML =  JSON.stringify(mapsMouseEvent.latLng.toJSON(), null, 2)
+    );
+    infoWindow.open(map);
+  });
+
+}
+
+</script>
+
+
+</body>
+</html>
+
+

@@ -1,0 +1,110 @@
+{% extends "seller/base.html" %}
+{% block content %}
+    {% load static %}
+
+    <div class="app-content">
+        <div class="app-content-header">
+            <div class="app-content-name-box">
+                <a href="{% url 'acceptOrder' %}" onclick="retailerproducts()" class="returnsvg">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-left">
+                  <line x1="19" y1="12" x2="5" y2="12"></line>
+                  <polyline points="12 19 5 12 12 5"></polyline>
+                </svg>
+              </a>
+              <h1 class="app-content-headerText products">Manage order</h1>
+            </div>
+        </div>
+
+        <div class="products-area-wrapper tableView mobile-overflow" style="margin-top: 2rem">
+            <div class="orderd-box">
+                <h1 class="orderd-header">Order <span>{{allord.id}}</span></h1>
+            </div>
+            <div class="products-header products-arrange mobile-header-orderdetails">
+                <div class="orderd-cust-details">
+                    <p class="orderd-cust title">Customer name</p>
+                    <p class="orderd-cust name">{{ allord.customer_name }}</p>
+                </div>
+                <div class="orderd-cust-details">
+                    <p class="orderd-cust title">Order status</p>
+                    <p class="orderd-cust name">{{ allord.order_status }}</p>
+                </div>
+                <div class="orderd-cust-details">
+                    <p class="orderd-cust title">Requested on</p>
+                    <p class="orderd-cust name">{{ allord.created_date }}</p>
+                </div>
+
+              </div>
+        </div>
+
+        <div class="orderd-productsview">
+            <div class="addproducts-row two">
+
+                <div class="addproducts-row-wrapper half one">
+                    {%  for pro in detail %}
+                    <div class="addproducts-container">
+                        <div class="orderd-con">
+                            <div class="products-cell image" style="width: auto">
+                                <img class="orderd-img" src="{{ pro.pro }}" width="50" height="50" alt="product">
+                                <div class="orderd-name">
+                                    <p class="product-name">{{ pro.name }}</p>
+
+                                </div>
+                            </div><p class="orderd-price count">{{ pro.count }}</p>
+
+                            <p class="orderd-price">₹{{ pro.price }}</p>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+
+
+                <div class="addproducts-row-wrapper half two">
+                    <div class="addproducts-container ">
+                        <div class="addproducts-container-header">
+                            <h4>Order details</h4>
+                            <div class="oredrd-side">
+                                <p class="name">Order type</p>
+                                <p class="details" id="delivery-type">{{ allord.order_type }}</p>
+                            </div>
+                            <div class="oredrd-side" id="pickup-orderd">
+                                <p class="name">Pickup date</p>
+                                <p class="details">16/04/2022 14:03</p>
+                            </div>
+                            <div class="oredrd-side">
+                                <p class="name">Payment id</p>
+                                <p class="details">{{ allord.payment_id }}</p>
+                            </div>
+                            <div class="oredrd-side">
+                                <p class="name"><b>Total Amount</b></p>
+                                <p class="details"><b>₹{{ allord.ttl_amount }}</b></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            <div>
+                 {% if allord.order_status == "PENDING" %}
+                <form method="POST" action="{% url 'acceptOrder' %}">
+                  {% csrf_token %}
+                  <input name="order_id" type="hidden" value={{ allord.id }}>
+                  <button type="submit" class="das-accept-order">
+                    Accept
+                  </button>
+              </form>
+            </div>
+            {% endif %}
+
+
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        const deliverytype = document.getElementById('delivery-type');
+        const pickuporderd = document.getElementById('pickup-orderd');
+        if (deliverytype.innerText === 'HOME_DELIVERY') {
+            pickuporderd.style.display = 'none';
+        }
+    </script>
+{% endblock %}
